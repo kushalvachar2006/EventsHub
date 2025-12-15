@@ -3,7 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext.jsx";
 import CollegeSelect from "../common/CollegeSelect";
-import { Mail, Lock, User, Building2, GraduationCap, ArrowRight, Sparkles } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  User,
+  Building2,
+  GraduationCap,
+  ArrowRight,
+  Sparkles,
+} from "lucide-react";
 import LuminaLogo from "../common/LuminaLogo.jsx";
 
 const RegisterForm = () => {
@@ -58,8 +66,11 @@ const RegisterForm = () => {
       <div className="absolute inset-0 overflow-hidden">
         {/* Animated gradient orbs - more subtle */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full mix-blend-screen filter blur-3xl animate-pulse-glow"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-screen filter blur-3xl animate-pulse-glow" style={{ animationDelay: "2s" }}></div>
-        
+        <div
+          className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-screen filter blur-3xl animate-pulse-glow"
+          style={{ animationDelay: "2s" }}
+        ></div>
+
         {/* Subtle grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
       </div>
@@ -73,12 +84,9 @@ const RegisterForm = () => {
               <div className="transform group-hover:scale-105 transition-transform duration-300">
                 <LuminaLogo size={80} />
               </div>
-              
             </div>
           </div>
-          <h1 className="heading-xl text-white mb-3">
-            Join Lumina
-          </h1>
+          <h1 className="heading-xl text-white mb-3">Join EventsHub</h1>
           <p className="text-lg text-slate-400 leading-relaxed">
             Create your account and start exploring events
           </p>
@@ -160,7 +168,8 @@ const RegisterForm = () => {
             {/* Department Field */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-slate-300 mb-2">
-                Department <span className="text-slate-500 font-normal">(optional)</span>
+                Department{" "}
+                <span className="text-slate-500 font-normal">(optional)</span>
               </label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
@@ -197,8 +206,18 @@ const RegisterForm = () => {
                   <option value="admin">College Admin</option>
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <svg className="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <svg
+                    className="h-5 w-5 text-slate-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </div>
               </div>
@@ -230,7 +249,9 @@ const RegisterForm = () => {
               <div className="w-full border-t border-slate-700/50"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-slate-800/50 text-slate-400">Already have an account?</span>
+              <span className="px-4 bg-slate-800/50 text-slate-400">
+                Already have an account?
+              </span>
             </div>
           </div>
 
@@ -246,7 +267,8 @@ const RegisterForm = () => {
 
         {/* Footer Text */}
         <p className="mt-6 text-center text-sm text-slate-500">
-          By creating an account, you agree to our Terms of Service and Privacy Policy
+          By creating an account, you agree to our Terms of Service and Privacy
+          Policy
         </p>
       </div>
     </div>

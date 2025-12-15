@@ -39,8 +39,11 @@ const LoginForm = () => {
       <div className="absolute inset-0 overflow-hidden">
         {/* Animated gradient orbs - brand */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/10 rounded-full mix-blend-screen filter blur-3xl animate-pulse-glow"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-violet/10 rounded-full mix-blend-screen filter blur-3xl animate-pulse-glow" style={{ animationDelay: "2s" }}></div>
-        
+        <div
+          className="absolute bottom-0 left-0 w-96 h-96 bg-brand-violet/10 rounded-full mix-blend-screen filter blur-3xl animate-pulse-glow"
+          style={{ animationDelay: "2s" }}
+        ></div>
+
         {/* Subtle grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
       </div>
@@ -60,7 +63,7 @@ const LoginForm = () => {
             Welcome Back
           </h1>
           <p className="text-lg text-slate-400">
-            Sign in to continue to Lumina
+            Sign in to continue to EventsHub
           </p>
         </div>
 
@@ -69,45 +72,45 @@ const LoginForm = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Input */}
             <div className="space-y-2">
-                          <label className="block text-sm font-semibold text-slate-300 mb-2">
-                            Email address
-                          </label>
-                          <div className="relative group">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                              <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-blue-400 transition-colors" />
-                            </div>
-                            <input
-                              type="email"
-                              required
-                              disabled={loading}
-                              className="input-field !pl-12"
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              placeholder="you@college.edu"
-                            />
-                  </div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Email address
+              </label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                  <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-blue-400 transition-colors" />
+                </div>
+                <input
+                  type="email"
+                  required
+                  disabled={loading}
+                  className="input-field !pl-12"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@college.edu"
+                />
               </div>
+            </div>
 
             {/* Password Input */}
             <div className="space-y-2">
-                          <label className="block text-sm font-semibold text-slate-300 mb-2">
-                            Password
-                          </label>
-                          <div className="relative group">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                              <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-blue-400 transition-colors" />
-                            </div>
-                            <input
-                              type="password"
-                              required
-                              disabled={loading}
-                              className="input-field !pl-12"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              placeholder="Enter password"
-                            />
-                          </div>
-                        </div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Password
+              </label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                  <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-blue-400 transition-colors" />
+                </div>
+                <input
+                  type="password"
+                  required
+                  disabled={loading}
+                  className="input-field !pl-12"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter password"
+                />
+              </div>
+            </div>
 
             {/* Submit Button */}
             <button
@@ -135,7 +138,9 @@ const LoginForm = () => {
               <div className="w-full border-t border-white/10"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white/5 text-slate-400">New to Lumina?</span>
+              <span className="px-4 bg-white/5 text-slate-400">
+                New to EventsHub?
+              </span>
             </div>
           </div>
 
@@ -152,9 +157,19 @@ const LoginForm = () => {
         {/* Footer */}
         <p className="mt-8 text-center text-xs text-slate-500">
           By signing in, you agree to our{" "}
-          <a href="#" className="text-slate-400 hover:text-brand-cyan transition-colors">Terms of Service</a>
-          {" "}and{" "}
-          <a href="#" className="text-slate-400 hover:text-brand-cyan transition-colors">Privacy Policy</a>
+          <a
+            href="#"
+            className="text-slate-400 hover:text-brand-cyan transition-colors"
+          >
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a
+            href="#"
+            className="text-slate-400 hover:text-brand-cyan transition-colors"
+          >
+            Privacy Policy
+          </a>
         </p>
       </div>
     </div>

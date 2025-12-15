@@ -1,6 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { User, Home, List, Plus, Bell, LogOut, ChevronDown, Settings, Menu, X } from "lucide-react";
+import {
+  User,
+  Home,
+  List,
+  Plus,
+  Bell,
+  LogOut,
+  ChevronDown,
+  Settings,
+  Menu,
+  X,
+} from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import LuminaLogo from "./LuminaLogo";
 
@@ -44,7 +55,9 @@ const Navbar = () => {
             <div className="group-hover:scale-105 transition-transform">
               <LuminaLogo size={40} />
             </div>
-            <span className="text-2xl font-bold text-white tracking-tight">Lumina</span>
+            <span className="text-2xl font-bold text-white tracking-tight">
+              EventsHub
+            </span>
           </button>
 
           {/* Mobile toggle */}
@@ -54,7 +67,11 @@ const Navbar = () => {
               onClick={() => setMobileOpen((v) => !v)}
               className="p-2 rounded-xl hover:bg-white/5 transition-colors"
             >
-              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {mobileOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
 
@@ -128,7 +145,11 @@ const Navbar = () => {
                     <span className="text-sm font-medium text-slate-200 hidden sm:block max-w-[120px] truncate">
                       {user.name}
                     </span>
-                    <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown
+                      className={`h-4 w-4 text-slate-400 transition-transform ${
+                        dropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
                   </button>
 
                   {/* Dropdown Menu */}
@@ -136,7 +157,9 @@ const Navbar = () => {
                     <div className="absolute right-0 mt-2 w-56 glass-panel border border-white/10 shadow-2xl rounded-xl overflow-hidden animate-fade-in">
                       <div className="p-2">
                         <div className="px-3 py-2 border-b border-white/10 mb-1">
-                          <p className="text-sm font-semibold text-white">{user.name}</p>
+                          <p className="text-sm font-semibold text-white">
+                            {user.name}
+                          </p>
                           <p className="text-xs text-slate-400">{user.email}</p>
                         </div>
                         <button
@@ -203,7 +226,9 @@ const Navbar = () => {
                     setMobileOpen(false);
                   }}
                   className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors ${
-                    pathname === "/dashboard" ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30" : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    pathname === "/dashboard"
+                      ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30"
+                      : "text-slate-300 hover:bg-white/5 hover:text-white"
                   }`}
                 >
                   <Home className="h-4 w-4" />
@@ -217,7 +242,9 @@ const Navbar = () => {
                       setMobileOpen(false);
                     }}
                     className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors ${
-                      pathname === "/my-registrations" ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30" : "text-slate-300 hover:bg-white/5 hover:text-white"
+                      pathname === "/my-registrations"
+                        ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30"
+                        : "text-slate-300 hover:bg-white/5 hover:text-white"
                     }`}
                   >
                     <List className="h-4 w-4" />
@@ -245,7 +272,9 @@ const Navbar = () => {
                       setMobileOpen(false);
                     }}
                     className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors ${
-                      pathname === "/admin/approvals" ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30" : "text-slate-300 hover:bg-white/5 hover:text-white"
+                      pathname === "/admin/approvals"
+                        ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30"
+                        : "text-slate-300 hover:bg-white/5 hover:text-white"
                     }`}
                   >
                     <Bell className="h-4 w-4" />
