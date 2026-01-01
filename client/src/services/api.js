@@ -97,6 +97,7 @@ export const hostAPI = {
 // Admin API
 export const adminAPI = {
   getPendingRequests: () => api.get("/admin/pending-requests"),
+  getApprovedRequests: () => api.get("/admin/approved-requests"),
   approveRequest: (reqId, feedback) =>
     api.post(`/admin/requests/${reqId}/approve`, { feedback }),
   rejectRequest: (reqId, feedback) =>

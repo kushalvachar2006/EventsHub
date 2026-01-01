@@ -60,7 +60,7 @@ const EventCard = ({ event }) => {
 
         {/* Description */}
         <p className="text-slate-400 text-sm mb-5 line-clamp-2 leading-relaxed">
-          {event?.description}
+          {(event?.description || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()}
         </p>
 
         {/* Location and CTA */}

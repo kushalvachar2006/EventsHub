@@ -6,12 +6,17 @@ const ApprovalCard = ({ request, onApprove, onReject }) => {
   const student = request.student || {};
   const event = request.event || {};
   const teamMembers = Array.isArray(request.teamMembers) ? request.teamMembers : [];
+  const attendance = Number(student.attendancePercentage ?? NaN);
+  const belowThreshold = Number.isFinite(attendance) && attendance < 75;
   return (
     <div className="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-all">
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="text-lg font-bold text-gray-900 mb-1">{student.name} ({student.email})</h3>
           <p className="text-sm text-gray-600">{student.department ? `${student.department} • ` : ''}{student.college}</p>
+          <p className="text-xs text-gray-600 mt-1">
+            Attendance: {Number.isFinite(attendance) ? `${attendance}%` : 'N/A'}
+          </p>
           <p className="text-sm text-gray-600 mt-2">
             Event: <span className="text-indigo-600 font-semibold">{event.title}</span>
           </p>
@@ -53,10 +58,11 @@ const ApprovalCard = ({ request, onApprove, onReject }) => {
         </button>
         <button
           onClick={() => onApprove(request._id)}
-          className="w-full sm:flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-xl hover:bg-green-600 transition-all flex items-center justify-center gap-2"
+          disabled={belowThreshold}
+          className={`w-full sm:flex-1 px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all flex items-center justify-center gap-2 ${belowThreshold ? 'bg-green-500/60 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
         >
           <CheckCircle className="h-4 w-4" />
-          Approve
+          {belowThreshold ? 'Attendance < 75%' : 'Approve'}
         </button>
       </div>
     </div>

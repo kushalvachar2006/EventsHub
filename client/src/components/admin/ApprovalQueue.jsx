@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { adminAPI } from '../../services/api';
-import ApprovalCard from './ApprovalCard';
+import { Link } from 'react-router-dom';
 
 const ApprovalQueue = () => {
   const [requests, setRequests] = useState([]);
@@ -24,30 +24,26 @@ const ApprovalQueue = () => {
     load();
   }, []);
 
-  const handleApprove = async (id) => {
-    const feedback = window.prompt('Optional feedback to student (leave blank if none):') || '';
-    await adminAPI.approveRequest(id, feedback);
-    await load();
-  };
-
-  const handleReject = async (id) => {
-    const feedback = window.prompt('Reason for rejection (optional):') || '';
-    await adminAPI.rejectRequest(id, feedback);
-    await load();
-  };
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {loading && <div>Loading...</div>}
       {error && <div className="text-red-600">{error}</div>}
       {!loading && requests.length === 0 && <div>No pending requests.</div>}
-      {requests.map((req) => (
-        <ApprovalCard
-          key={req._id}
-          request={req}
-          onApprove={handleApprove}
-          onReject={handleReject}
-        />)
+      {!loading && requests.length > 0 && (
+        <ul className="divide-y divide-white/10 rounded-xl overflow-hidden border border-white/10">
+          {requests.map((req) => {
+            const student = req.student || {};
+            const event = req.event || {};
+            const subject = `${student.name || 'Student'} – Permission request for ${event.title || 'Event'}`;
+            return (
+              <li key={req._id} className="bg-slate-900/40 hover:bg-slate-900/60 transition">
+                <Link to={`/admin/requests/${req._id}`} className="block px-4 py-3">
+                  <div className="text-sm font-semibold text-white truncate">{subject}</div>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </div>
   );

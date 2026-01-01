@@ -27,6 +27,8 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 // Student Page Imports
 import MyRegistrationsPage from "./pages/MyRegistrationsPage.jsx";
 import PermissionFormPage from "./pages/PermissionFormPage.jsx";
+import StudentNotificationsPage from "./pages/StudentNotificationsPage.jsx";
+import StudentEventRegistrationPage from "./pages/StudentEventRegistrationPage.jsx";
 
 // Host Page Imports
 import CreateEventPage from "./pages/CreateEventPage.jsx";
@@ -35,6 +37,8 @@ import EventRegistrationsPage from "./pages/EventRegistrationsPage.jsx";
 
 // Admin Page Imports
 import AdminApprovalPage from "./pages/AdminApprovalPage.jsx";
+import AdminRequestDetailPage from "./pages/AdminRequestDetailPage.jsx";
+import AdminApprovedPage from "./pages/AdminApprovedPage.jsx";
 
 // Host Edit Page
 import EditEventPage from "./pages/EditEventPage.jsx";
@@ -104,6 +108,14 @@ function App() {
                     path="/permission-form/:regId"
                     element={<PermissionFormPage />}
                   />
+                  <Route
+                    path="/notifications"
+                    element={<StudentNotificationsPage />}
+                  />
+                  <Route
+                    path="/events/:id/register"
+                    element={<StudentEventRegistrationPage />}
+                  />
                 </Route>
 
                 {/* Host-Only Routes */}
@@ -125,6 +137,14 @@ function App() {
                   <Route
                     path="/admin/approvals"
                     element={<AdminApprovalPage />}
+                  />
+                  <Route
+                    path="/admin/requests/:id"
+                    element={<AdminRequestDetailPage />}
+                  />
+                  <Route
+                    path="/admin/approved"
+                    element={<AdminApprovedPage />}
                   />
                 </Route>
 

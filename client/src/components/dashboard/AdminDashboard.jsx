@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bell } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
-import ApprovalCard from '../admin/ApprovalCard';
 
 const AdminDashboard = ({ user, onNavigate }) => {
   const [pendingCount, setPendingCount] = useState(0);
@@ -27,19 +27,7 @@ const AdminDashboard = ({ user, onNavigate }) => {
     load();
   }, []);
 
-  const handleApprove = async (id) => {
-    const feedback = window.prompt('Optional feedback to student (leave blank if none):') || '';
-    await adminAPI.approveRequest(id, feedback);
-    setLoading(true);
-    await load();
-  };
-
-  const handleReject = async (id) => {
-    const feedback = window.prompt('Reason for rejection (optional):') || '';
-    await adminAPI.rejectRequest(id, feedback);
-    setLoading(true);
-    await load();
-  };
+  // Detailed approve/reject is now handled in the request detail page.
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 animate-fade-in">
@@ -67,7 +55,7 @@ const AdminDashboard = ({ user, onNavigate }) => {
         </div>
       </div>
 
-      {/* Requests Grid */}
+      {/* Requests List (subjects only) */}
       <div className="card-floating p-8">
         {loading && (
           <div className="text-center py-12">
@@ -89,17 +77,20 @@ const AdminDashboard = ({ user, onNavigate }) => {
         )}
         
         {!loading && !error && requests.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {requests.map((req, index) => (
-              <div key={req._id} className="animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                <ApprovalCard
-                  request={req}
-                  onApprove={handleApprove}
-                  onReject={handleReject}
-                />
-              </div>
-            ))}
-          </div>
+          <ul className="divide-y divide-white/10 rounded-xl overflow-hidden border border-white/10">
+            {requests.map((req, index) => {
+              const student = req.student || {};
+              const event = req.event || {};
+              const subject = `${student.name || 'Student'} – Permission request for ${event.title || 'Event'}`;
+              return (
+                <li key={req._id} className="bg-slate-900/40 hover:bg-slate-900/60 transition animate-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
+                  <Link to={`/admin/requests/${req._id}`} className="block px-4 py-3">
+                    <div className="text-sm font-semibold text-white truncate">{subject}</div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         )}
       </div>
     </div>

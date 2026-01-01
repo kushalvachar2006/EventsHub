@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PageLayout from '../components/common/PageLayout';
-import EventForm from '../components/events/EventForm';
+import EventCreateWizard from '../components/events/EventCreateWizard.jsx';
 import { eventsAPI } from '../services/api';
 import { useToast } from '../context/ToastContext.jsx';
 
@@ -44,7 +44,7 @@ const EditEventPage = () => {
 
   return (
     <PageLayout title="Edit Event">
-      <EventForm initialValues={initialValues} onSubmit={handleUpdate} submitLabel="Update Event" />
+      <EventCreateWizard initialValues={initialValues} onSubmit={handleUpdate} />
     </PageLayout>
   );
 };

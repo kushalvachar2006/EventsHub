@@ -6,6 +6,7 @@ import {
   List,
   Plus,
   Bell,
+  CheckCircle2,
   LogOut,
   ChevronDown,
   Settings,
@@ -79,18 +80,20 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-2">
             {user ? (
               <>
-                {/* Dashboard Link */}
-                <button
-                  onClick={() => navigate("/dashboard")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                    isActive("/dashboard")
-                      ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30"
-                      : "text-slate-300 hover:bg-white/5 hover:text-white"
-                  }`}
-                >
-                  <Home className="h-4 w-4" />
-                  Dashboard
-                </button>
+                {/* Primary nav for role */}
+                {user.role === "student" ? (
+                  <button
+                    onClick={() => navigate("/notifications")}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                      isActive("/notifications")
+                        ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30"
+                        : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    <Bell className="h-4 w-4" />
+                    Notifications
+                  </button>
+                ) : null}
 
                 {/* Student Registrations */}
                 {user.role === "student" && (
@@ -130,6 +133,19 @@ const Navbar = () => {
                   >
                     <Bell className="h-4 w-4" />
                     Approvals
+                  </button>
+                )}
+                {user.role === "admin" && (
+                  <button
+                    onClick={() => navigate("/admin/approved")}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                      isActive("/admin/approved")
+                        ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30"
+                        : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    Approved
                   </button>
                 )}
 
@@ -220,20 +236,22 @@ const Navbar = () => {
           <div className="px-4 py-3 space-y-2">
             {user ? (
               <>
-                <button
-                  onClick={() => {
-                    navigate("/dashboard");
-                    setMobileOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors ${
-                    pathname === "/dashboard"
-                      ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30"
-                      : "text-slate-300 hover:bg-white/5 hover:text-white"
-                  }`}
-                >
-                  <Home className="h-4 w-4" />
-                  Dashboard
-                </button>
+                {user.role === "student" ? (
+                  <button
+                    onClick={() => {
+                      navigate("/notifications");
+                      setMobileOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors ${
+                      pathname === "/notifications"
+                        ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30"
+                        : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    <Bell className="h-4 w-4" />
+                    Notifications
+                  </button>
+                ) : null}
 
                 {user.role === "student" && (
                   <button
@@ -279,6 +297,22 @@ const Navbar = () => {
                   >
                     <Bell className="h-4 w-4" />
                     Approvals
+                  </button>
+                )}
+                {user.role === "admin" && (
+                  <button
+                    onClick={() => {
+                      navigate("/admin/approved");
+                      setMobileOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors ${
+                      pathname === "/admin/approved"
+                        ? "bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30"
+                        : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    Approved
                   </button>
                 )}
 

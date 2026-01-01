@@ -1,29 +1,30 @@
-import React from 'react';
+﻿import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '../components/common/PageLayout';
-import EventForm from '../components/events/EventForm';
+import EventCreateWizard from '../components/events/EventCreateWizard.jsx';
 import { eventsAPI } from '../services/api';
 import { useToast } from '../context/ToastContext.jsx';
+ 
 
 const CreateEventPage = () => {
   const navigate = useNavigate();
   const { show } = useToast();
-
-  const handleCreate = async (formData) => {
+  
+  const handleSubmit = async (form) => {
     try {
-      await eventsAPI.createEvent(formData);
+      await eventsAPI.createEvent(form);
       show('Event created successfully', 'success');
       navigate('/my-events');
     } catch (e) {
       const msg = e?.response?.data?.message || 'Failed to create event';
       show(msg, 'error');
-      throw e; // keep EventForm inline error behavior
+      throw e;
     }
   };
 
   return (
     <PageLayout title="Create a New Event">
-      <EventForm onSubmit={handleCreate} submitLabel="Publish Event" />
+      <EventCreateWizard onSubmit={handleSubmit} />
     </PageLayout>
   );
 };
