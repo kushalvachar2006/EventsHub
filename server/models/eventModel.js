@@ -17,6 +17,13 @@ const eventSchema = new mongoose.Schema({
   teamSize: { type: Number }, // Maximum team size
   minTeamSize: { type: Number, default: 1 }, // Minimum team size required
   requireTeamDetails: { type: Boolean, default: false }, // Whether team member details are mandatory
+  prizePool: { type: Number },
+  prizeCurrency: { type: String, default: "INR" },
+  // Organizer / host-provided details
+  organizerName: { type: String },
+  contactEmail: { type: String },
+  organizerWebsite: { type: String },
+  website: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 

@@ -79,6 +79,12 @@ const createEvent = async (req, res) => {
     teamSize,
     minTeamSize,
     requireTeamDetails,
+    prizePool,
+    prizeCurrency,
+    organizerName,
+    contactEmail,
+    organizerWebsite,
+    website,
   } = req.body;
 
   try {
@@ -116,6 +122,16 @@ const createEvent = async (req, res) => {
         requireTeamDetails === "true" || requireTeamDetails === true,
       college: req.user.college, // Event belongs to host's college
       host: req.user.id,
+      // optional fields provided by host
+      prizePool:
+        prizePool !== undefined && prizePool !== null && prizePool !== ""
+          ? Number(prizePool)
+          : undefined,
+      prizeCurrency: prizeCurrency || undefined,
+      organizerName: organizerName || undefined,
+      contactEmail: contactEmail || undefined,
+      organizerWebsite: organizerWebsite || website || undefined,
+      website: website || organizerWebsite || undefined,
     });
     res.status(201).json(event);
   } catch (error) {
@@ -175,6 +191,12 @@ const updateEvent = async (req, res) => {
       teamSize,
       minTeamSize,
       requireTeamDetails,
+      prizePool,
+      prizeCurrency,
+      organizerName,
+      contactEmail,
+      organizerWebsite,
+      website,
     } = req.body;
     if (title !== undefined) event.title = title;
     if (description !== undefined) event.description = description;
@@ -188,6 +210,15 @@ const updateEvent = async (req, res) => {
     if (requireTeamDetails !== undefined)
       event.requireTeamDetails =
         requireTeamDetails === "true" || requireTeamDetails === true;
+
+    // Optional host-provided fields
+    if (prizePool !== undefined) event.prizePool = Number(prizePool);
+    if (prizeCurrency !== undefined) event.prizeCurrency = prizeCurrency;
+    if (organizerName !== undefined) event.organizerName = organizerName;
+    if (contactEmail !== undefined) event.contactEmail = contactEmail;
+    if (organizerWebsite !== undefined)
+      event.organizerWebsite = organizerWebsite;
+    if (website !== undefined) event.website = website;
 
     // Update banner if a new file is uploaded
     if (req.file && req.file.buffer) {

@@ -27,6 +27,12 @@ const StudentEventRegistrationPage = () => {
         setError("");
         const { data } = await eventsAPI.getEvent(id);
         setEvent(data);
+        // Initialize member rows based on min team size (excluding leader)
+        const minTeam = Number(data?.minTeamSize || 1);
+        const minMembersRequired = Math.max(minTeam - 1, 0);
+        if (minMembersRequired >= 0) {
+          setMembers(Array.from({ length: minMembersRequired }, () => ({ name: "", email: "", phoneNumber: "" })));
+        }
       } catch (e) {
         setError("Failed to load event");
       } finally {
@@ -44,9 +50,12 @@ const StudentEventRegistrationPage = () => {
   const canSubmit = () => {
     if (!teamName.trim()) return false;
     if (deadlinePassed) return false;
-    const min = Number(event?.minTeamSize || 1);
+    const minTeam = Number(event?.minTeamSize || 1);
+    const maxTeam = Number(event?.teamSize || minTeam);
+    const minMembersRequired = Math.max(minTeam - 1, 0); // excluding leader
+    const maxMembersAllowed = Math.max(maxTeam - 1, 0);  // excluding leader
     const nonEmpty = members.filter((m) => m.name || m.email || m.phoneNumber);
-    return nonEmpty.length >= min;
+    return nonEmpty.length >= minMembersRequired && nonEmpty.length <= maxMembersAllowed;
   };
 
   const onSubmit = async (e) => {
@@ -115,6 +124,10 @@ const StudentEventRegistrationPage = () => {
                 <div className="flex items-center gap-2 text-sm font-semibold mb-2">
                   <Users className="h-4 w-4" /> Team Members
                 </div>
+                <p className="text-xs text-slate-400 mb-2">
+                  Allowed team size: {Number(event?.minTeamSize || 1)} to {Number(event?.teamSize || event?.minTeamSize || 1)} members including the team leader.
+                  {` You can add up to ${Math.max(Number(event?.teamSize || 1) - 1, 0)} member(s) here.`}
+                </p>
                 <div className="space-y-3">
                   {members.map((m, idx) => (
                     <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -131,8 +144,22 @@ const StudentEventRegistrationPage = () => {
                   ))}
                 </div>
                 <div className="mt-3 flex gap-3">
-                  <button type="button" className="text-brand-cyan text-sm" onClick={() => setMembers((p) => [...p, { name: "", email: "", phoneNumber: "" }])}>+ Add member</button>
-                  {members.length > 1 && (
+                  <button
+                    type="button"
+                    className="text-brand-cyan text-sm"
+                    onClick={() => {
+                      const maxTeam = Number(event?.teamSize || event?.minTeamSize || 1);
+                      const maxMembersAllowed = Math.max(maxTeam - 1, 0);
+                      if (members.length >= maxMembersAllowed) {
+                        show(`You can add up to ${maxMembersAllowed} member(s) for this event.`, 'error');
+                        return;
+                      }
+                      setMembers((p) => [...p, { name: "", email: "", phoneNumber: "" }]);
+                    }}
+                  >
+                    + Add member
+                  </button>
+                  {members.length > 0 && (
                     <button type="button" className="text-slate-400 text-sm" onClick={() => setMembers((p) => p.slice(0, -1))}>Remove last</button>
                   )}
                 </div>

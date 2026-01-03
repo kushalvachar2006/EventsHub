@@ -1,6 +1,7 @@
 const Registration = require('../models/registrationModel');
 const PermissionRequest = require('../models/permissionModel');
 const Event = require('../models/eventModel');
+const Notification = require('../models/notificationModel');
 
 // @desc    Register for an event
 // @route   POST /api/student/register/:id
@@ -43,6 +44,22 @@ const registerForEvent = async (req, res) => {
         phoneNumber: m?.phoneNumber || '',
       })),
     });
+
+    // Notify host about new registration
+    try {
+      if (event?.host) {
+        const message = `${req.user?.name || 'A student'} registered for ${event.title || 'your event'}`;
+        await Notification.create({
+          recipient: event.host,
+          type: 'registration',
+          registration: registration._id,
+          event: event._id,
+          message,
+        });
+      }
+    } catch (notifyErr) {
+      // non-blocking
+    }
 
     res.status(201).json(registration);
   } catch (error) {

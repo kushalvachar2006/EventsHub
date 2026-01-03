@@ -28,6 +28,7 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import MyRegistrationsPage from "./pages/MyRegistrationsPage.jsx";
 import PermissionFormPage from "./pages/PermissionFormPage.jsx";
 import StudentNotificationsPage from "./pages/StudentNotificationsPage.jsx";
+import HostNotificationsPage from "./pages/HostNotificationsPage.jsx";
 import StudentEventRegistrationPage from "./pages/StudentEventRegistrationPage.jsx";
 
 // Host Page Imports
@@ -129,6 +130,10 @@ function App() {
                   <Route
                     path="/host/events/:id/edit"
                     element={<EditEventPage />}
+                  />
+                  <Route
+                    path="/host/notifications"
+                    element={<HostNotificationsPage />}
                   />
                 </Route>
 

@@ -2,7 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { studentAPI } from "../services/api";
 import { formatDate } from "../utils/date";
-import { Calendar, CheckCircle, Clock, XCircle, FileText, X } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle,
+  Clock,
+  XCircle,
+  FileText,
+  X,
+} from "lucide-react";
 
 const MyRegistrationsPage = () => {
   const [items, setItems] = useState([]);
@@ -72,7 +79,10 @@ const MyRegistrationsPage = () => {
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/10 rounded-full mix-blend-screen filter blur-3xl animate-pulse-glow"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-violet/10 rounded-full mix-blend-screen filter blur-3xl animate-pulse-glow" style={{ animationDelay: "2s" }}></div>
+        <div
+          className="absolute bottom-0 left-0 w-96 h-96 bg-brand-violet/10 rounded-full mix-blend-screen filter blur-3xl animate-pulse-glow"
+          style={{ animationDelay: "2s" }}
+        ></div>
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
       </div>
 
@@ -104,14 +114,14 @@ const MyRegistrationsPage = () => {
 
           {!loading && items.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-slate-300 text-lg mb-4">No registrations yet</p>
-              <p className="text-slate-400 text-sm mb-6">
-                You haven't registered for any events yet. Start exploring events!
+              <p className="text-slate-300 text-lg mb-4">
+                No registrations yet
               </p>
-              <Link
-                to="/events"
-                className="inline-block btn-primary"
-              >
+              <p className="text-slate-400 text-sm mb-6">
+                You haven't registered for any events yet. Start exploring
+                events!
+              </p>
+              <Link to="/events" className="inline-block btn-primary">
                 Browse Events
               </Link>
             </div>
@@ -134,14 +144,20 @@ const MyRegistrationsPage = () => {
                       </Link>
                       <div className="flex items-center gap-2 text-slate-400 text-sm mb-3">
                         <Calendar className="h-4 w-4" />
-                        <span>{reg.event?.date ? formatDate(reg.event.date) : ""}</span>
+                        <span>
+                          {reg.event?.date ? formatDate(reg.event.date) : ""}
+                        </span>
                       </div>
                       {reg.feedback && (
                         <div className="mt-3 p-3 bg-amber-500/20 border border-amber-500/30 rounded-lg">
                           <p className="text-xs font-semibold text-amber-400 mb-1">
-                            {reg.status === "not-selected" ? "📌 Rejection Reason" : "📌 Remark"}
+                            {reg.status === "not-selected"
+                              ? "📌 Rejection Reason"
+                              : "📌 Remark"}
                           </p>
-                          <p className="text-sm text-amber-300">{reg.feedback}</p>
+                          <p className="text-sm text-amber-300">
+                            {reg.feedback}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -172,6 +188,15 @@ const MyRegistrationsPage = () => {
                           View Details
                         </button>
                       )}
+                      {reg.status === "not-selected" && (
+                        <button
+                          onClick={() => setDetailsReg(reg)}
+                          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border border-red-500/30"
+                        >
+                          <FileText className="h-4 w-4" />
+                          View Details
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -191,10 +216,16 @@ const MyRegistrationsPage = () => {
           <div className="relative bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-lg mx-auto p-6 max-h-[85vh] overflow-y-auto border border-slate-700/50">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h3 className="text-2xl font-bold text-white">Team Details</h3>
+                <h3 className="text-2xl font-bold text-white">
+                  {detailsReg?.status === "not-selected"
+                    ? "Rejection Details"
+                    : "Team Details"}
+                </h3>
                 <p className="text-sm text-slate-400 mt-1">
                   {detailsReg?.event?.title || "Event"} •{" "}
-                  {detailsReg?.event?.date ? formatDate(detailsReg.event.date) : ""}
+                  {detailsReg?.event?.date
+                    ? formatDate(detailsReg.event.date)
+                    : ""}
                 </p>
               </div>
               <button
@@ -226,10 +257,13 @@ const MyRegistrationsPage = () => {
                     Team Leader
                   </label>
                   <div className="w-full px-4 py-3 bg-slate-900/50 border-2 border-slate-700 rounded-xl text-white">
-                    <p className="font-medium">{detailsReg.teamLeader.name || "—"}</p>
+                    <p className="font-medium">
+                      {detailsReg.teamLeader.name || "—"}
+                    </p>
                     <p className="text-sm text-slate-400 mt-1">
                       {detailsReg.teamLeader.email || ""}
-                      {detailsReg.teamLeader.email && detailsReg.teamLeader.phoneNumber
+                      {detailsReg.teamLeader.email &&
+                      detailsReg.teamLeader.phoneNumber
                         ? " • "
                         : ""}
                       {detailsReg.teamLeader.phoneNumber || ""}
@@ -261,6 +295,17 @@ const MyRegistrationsPage = () => {
                   </div>
                 </div>
               )}
+
+            {detailsReg?.status === "not-selected" && detailsReg?.feedback && (
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Rejection Reason
+                </label>
+                <div className="w-full px-4 py-3 bg-red-900/10 border-2 border-red-500/30 rounded-xl text-amber-300">
+                  {detailsReg.feedback}
+                </div>
+              </div>
+            )}
 
             <div className="mt-6 flex justify-end">
               <button

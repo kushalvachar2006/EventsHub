@@ -35,6 +35,11 @@ exports.markAsRead = async (req, res) => {
     }
 
     notification.read = true;
+    // mark read and schedule deletion after 24 hours
+    notification.read = true;
+    // set deleteAt 24 hours from now
+    const DELETE_AFTER_MS = 24 * 60 * 60 * 1000;
+    notification.deleteAt = new Date(Date.now() + DELETE_AFTER_MS);
     await notification.save();
 
     res.status(200).json({

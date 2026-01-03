@@ -37,7 +37,12 @@ const registrationSchema = new mongoose.Schema({
     },
   ],
   feedback: { type: String }, // Host's feedback on rejection or selection
+  rejectedAt: { type: Date }, // Set when status becomes 'not-selected' to enable TTL auto-delete
   registrationDate: { type: Date, default: Date.now },
 });
+
+// TTL index: deletes documents 12 hours after 'rejectedAt' timestamp
+// Only documents that have 'rejectedAt' set will be removed
+registrationSchema.index({ rejectedAt: 1 }, { expireAfterSeconds: 43200 });
 
 module.exports = mongoose.model("Registration", registrationSchema);

@@ -165,6 +165,8 @@ exports.rejectStudent = async (req, res) => {
 
     registration.status = "not-selected";
     if (feedback) registration.feedback = feedback;
+    // set TTL anchor so this registration auto-deletes after 12 hours
+    registration.rejectedAt = new Date();
     await registration.save();
 
     // Create notification for the student
