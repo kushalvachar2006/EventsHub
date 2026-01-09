@@ -71,7 +71,12 @@ const EventListPage = () => {
         onFilterChange={handleFilterChange}
         onClear={handleClearFilters}
       />
-      {loading && <div className="mt-6">Loading...</div>}
+      {loading && (
+        <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-cyan"></div>
+              <p className="text-slate-400 mt-4">Loading...</p>
+        </div>
+      )}
       {error && <div className="mt-6 text-red-600">{error}</div>}
 
       {!loading && !error && events.length === 0 && (

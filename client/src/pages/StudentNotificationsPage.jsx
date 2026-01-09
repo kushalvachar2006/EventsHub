@@ -98,7 +98,10 @@ const StudentNotificationsPage = () => {
     <PageLayout title="Notifications">
       <div className="space-y-4">
         {loading && (
-          <div className="text-slate-400">Loading notifications...</div>
+          <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-cyan"></div>
+              <p className="text-slate-400 mt-4">Loading notifications...</p>
+            </div>
         )}
         {error && <div className="text-red-400">{error}</div>}
         {!loading && !error && items.length === 0 && (
