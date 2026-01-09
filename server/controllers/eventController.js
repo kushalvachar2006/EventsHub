@@ -13,13 +13,6 @@ cloudinary.config({
 const getAllEvents = async (req, res) => {
   try {
     const { college, search } = req.query;
-    // Auto-delete events with past registration deadlines
-    const now = new Date();
-    try {
-      await Event.deleteMany({ registrationDeadline: { $ne: null, $lt: now } });
-    } catch (cleanupErr) {
-      // Swallow cleanup errors to not break listing
-    }
     let query = {};
 
     // Filter by college if provided
@@ -48,16 +41,6 @@ const getEventById = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id).populate("host", "name");
     if (event) {
-      // If expired, delete and respond as not found
-      if (
-        event.registrationDeadline &&
-        new Date(event.registrationDeadline) < new Date()
-      ) {
-        try {
-          await event.deleteOne();
-        } catch {}
-        return res.status(404).json({ message: "Event not found" });
-      }
       return res.status(200).json(event);
     }
     return res.status(404).json({ message: "Event not found" });

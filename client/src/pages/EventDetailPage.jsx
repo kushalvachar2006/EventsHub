@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { eventsAPI, studentAPI } from "../services/api";
@@ -54,10 +54,25 @@ const EventDetailPage = () => {
     };
     load();
   }, [id, user]);
+  const registrationClosed = useMemo(() => {
+    if (!event?.registrationDeadline) return false;
+    return new Date() > new Date(event.registrationDeadline);
+  }, [event]);
+  const toastShownRef = useRef(false);
+  useEffect(() => {
+    if (registrationClosed && !toastShownRef.current) {
+      show("Registration is closed for this event.", "info");
+      toastShownRef.current = true;
+    }
+  }, [registrationClosed, show]);
   const exceedsTeamSize = () => false; // team size checks now move to registration page
   const onRegister = () => {
     if (alreadyRegistered) {
       show("You have already registered for this event.", "info");
+      return;
+    }
+    if (registrationClosed) {
+      show("Registration is closed for this event.", "info");
       return;
     }
     setRegLoading(true);
@@ -248,12 +263,15 @@ const EventDetailPage = () => {
                     disabled={
                       regLoading ||
                       alreadyRegistered ||
-                      (event.registrationDeadline &&
-                        new Date() > new Date(event.registrationDeadline))
+                      registrationClosed
                     }
                     className="w-full btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {alreadyRegistered ? "Already Registered" : "Register"}
+                    {alreadyRegistered
+                      ? "Already Registered"
+                      : registrationClosed
+                      ? "NoRegistration"
+                      : "Register"}
                   </button>
                 ) : !user ? (
                   <button
@@ -273,18 +291,14 @@ const EventDetailPage = () => {
           {/* Primary content */}
           <div className="lg:col-span-9 space-y-6">
             {(() => {
-              const strip = (html) =>
-                (html || "")
-                  .replace(/<[^>]*>/g, "")
-                  .replace(/\s+/g, " ")
-                  .trim();
               const Section = ({ title, content }) =>
                 content ? (
                   <section className="glass-panel rounded-2xl p-6">
                     <h2 className="text-xl font-semibold mb-3">{title}</h2>
-                    <p className="text-slate-200 leading-relaxed whitespace-pre-line">
-                      {strip(content)}
-                    </p>
+                    <div
+                      className="prose prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{ __html: String(content) }}
+                    />
                   </section>
                 ) : null;
               return (
@@ -348,6 +362,9 @@ const EventDetailPage = () => {
                   </div>
                 )}
               </div>
+              {registrationClosed && (
+                <p className="text-xs text-red-400 mt-2">Registration closed.</p>
+              )}
               <p className="text-xs text-slate-400 mt-3">
                 You will be asked for team details on the next page.
               </p>

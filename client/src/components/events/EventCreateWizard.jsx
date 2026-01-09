@@ -278,6 +278,27 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
     document.execCommand("insertText", false, text);
   };
 
+  const insertBulletListFallback = () => {
+  if (!editorRef.current) return;
+
+  editorRef.current.focus();
+
+  // Ensure caret is inside editor
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) {
+    placeCaretEnd(editorRef.current);
+  }
+
+  // Insert bullet list HTML
+  document.execCommand(
+    "insertHTML",
+    false,
+    "<ul><li><br></li></ul>"
+  );
+
+  saveSelection();
+};
+
   // Ensure caret placement when focusing the editor
   const placeCaretEnd = (el) => {
     try {
@@ -538,27 +559,38 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
                 </button>
                 <span className="mx-1 opacity-50">|</span>
                 <button
-                  type="button"
-                  className="px-2 py-1 rounded hover:bg-white/5"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    saveSelection();
-                    exec("insertUnorderedList");
-                  }}
-                >
-                  • List
-                </button>
+  type="button"
+  className="px-2 py-1 rounded hover:bg-white/5"
+  onMouseDown={(e) => {
+    e.preventDefault();
+    insertBulletListFallback();
+  }}
+>
+  • List
+</button>
+
+
                 <button
-                  type="button"
-                  className="px-2 py-1 rounded hover:bg-white/5"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    saveSelection();
-                    exec("insertOrderedList");
-                  }}
-                >
-                  1. List
-                </button>
+  type="button"
+  className="px-2 py-1 rounded hover:bg-white/5"
+  onMouseDown={(e) => {
+    e.preventDefault();
+
+    if (!editorRef.current) return;
+
+    editorRef.current.focus();
+
+    if (!window.getSelection()?.rangeCount) {
+      placeCaretEnd(editorRef.current);
+    }
+
+    document.execCommand("insertOrderedList");
+    saveSelection();
+  }}
+>
+  1. List
+</button>
+
                 <span className="mx-1 opacity-50">|</span>
                 <button
                   type="button"
@@ -576,12 +608,16 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
                   className="px-2 py-1 rounded hover:bg-white/5"
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    saveSelection();
-                    clearFormat();
-                  }}
-                >
-                  Clear
+                    if (!editorRef.current) return;
+                    editorRef.current.innerHTML = "";
+                    setDescription("");
+                    selectionRef.current = null;
+                    editorRef.current.focus();
+                    }}>
+                      Clear
                 </button>
+
+
               </div>
               <div
                 ref={editorRef}
@@ -600,7 +636,7 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
                 onFocus={() => placeCaretEnd(editorRef.current)}
                 onKeyUp={saveSelection}
                 onMouseUp={saveSelection}
-                className="min-h-[140px] px-4 py-3 text-white outline-none"
+                className="min-h-[140px] px-4 py-3 text-white outline-none prose prose-invert max-w-none"
                 style={{ whiteSpace: "pre-wrap" }}
                 data-placeholder="What is your event about?"
               />
