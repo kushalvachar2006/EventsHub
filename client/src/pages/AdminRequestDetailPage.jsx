@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/common/PageLayout';
 import { adminAPI } from '../services/api';
@@ -11,6 +11,7 @@ const AdminRequestDetailPage = () => {
   const [error, setError] = useState('');
   const [request, setRequest] = useState(null);
   const [acting, setActing] = useState(false);
+  const letterRef = useRef(null);
 
   const load = async () => {
     try {
@@ -27,6 +28,26 @@ const AdminRequestDetailPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onPrint = () => {
+    if (!letterRef.current) return;
+    const content = letterRef.current.innerText || '';
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(`<!DOCTYPE html><html><head><title>Permission Letter</title><style>
+      body{font-family: ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial; padding:24px; color:#111}
+      pre{white-space:pre-wrap; font-size:14px; line-height:1.6}
+      h1{font-size:18px; margin-bottom:12px}
+    </style></head><body>
+      <h1>Permission Request</h1>
+      <pre>${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+    </body></html>`);
+    win.document.close();
+    win.focus();
+    win.print();
+    // Optionally close after print
+    // win.close();
   };
 
   useEffect(() => {
@@ -76,12 +97,19 @@ const AdminRequestDetailPage = () => {
 
             <div className="mb-8">
               <div className="text-sm text-slate-400">Body</div>
-              <div className="mt-2 whitespace-pre-line text-slate-200 bg-white/5 border border-white/10 rounded-xl p-4">
+              <div ref={letterRef} className="mt-2 whitespace-pre-line text-slate-200 bg-white/5 border border-white/10 rounded-xl p-4">
                 {request.reasonForAttending || '—'}
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={onPrint}
+                disabled={acting}
+                className="w-full sm:flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-slate-600 rounded-xl hover:bg-slate-500 transition-all"
+              >
+                Print Letter (PDF)
+              </button>
               <button
                 onClick={() => onAction('reject')}
                 disabled={acting}

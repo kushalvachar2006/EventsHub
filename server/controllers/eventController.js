@@ -1,4 +1,6 @@
 const Event = require("../models/eventModel");
+const Registration = require("../models/registrationModel");
+const PermissionRequest = require("../models/permissionModel");
 const cloudinary = require("cloudinary").v2;
 
 // Configure Cloudinary once
@@ -139,8 +141,12 @@ const deleteEvent = async (req, res) => {
         .json({ message: "Not authorized to delete this event" });
     }
 
+    // Cascade delete related registrations and permission requests
+    await Registration.deleteMany({ event: event._id });
+    await PermissionRequest.deleteMany({ event: event._id });
+
     await event.deleteOne();
-    res.status(200).json({ message: "Event removed" });
+    res.status(200).json({ message: "Event and related data removed" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

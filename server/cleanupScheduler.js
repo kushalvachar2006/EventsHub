@@ -1,15 +1,29 @@
 const mongoose = require('mongoose');
 const Event = require('./models/eventModel');
+const Registration = require('./models/registrationModel');
+const PermissionRequest = require('./models/permissionModel');
 
 const startCleanup = () => {
   const cleanupExpiredEvents = async () => {
     try {
       const now = new Date();
-      const result = await Event.deleteMany({
-        registrationDeadline: { $ne: null, $lt: now },
-      });
-      if (result && result.deletedCount) {
-        console.log(`Cleanup: deleted ${result.deletedCount} expired events`);
+      // Consider events expired if either registrationDeadline has passed OR event date has passed
+      const expiredEvents = await Event.find({
+        $or: [
+          { registrationDeadline: { $ne: null, $lt: now } },
+          { date: { $lt: now } },
+        ],
+      }).select('_id');
+
+      if (expiredEvents.length) {
+        const ids = expiredEvents.map((e) => e._id);
+        // Cascade delete related data first
+        const regDel = await Registration.deleteMany({ event: { $in: ids } });
+        const permDel = await PermissionRequest.deleteMany({ event: { $in: ids } });
+        const evtDel = await Event.deleteMany({ _id: { $in: ids } });
+        console.log(
+          `Cleanup: deleted ${evtDel.deletedCount} events, ${regDel.deletedCount} registrations, ${permDel.deletedCount} permission requests`
+        );
       }
     } catch (e) {
       console.error('Cleanup error:', e.message);

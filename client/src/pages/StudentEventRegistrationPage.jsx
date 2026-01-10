@@ -19,6 +19,7 @@ const StudentEventRegistrationPage = () => {
 
   const [teamName, setTeamName] = useState("");
   const [members, setMembers] = useState([{ name: "", email: "", phoneNumber: "" }]);
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -51,6 +52,13 @@ const StudentEventRegistrationPage = () => {
     load();
   }, [id]);
 
+  // Prefill phone number from user profile when available
+  useEffect(() => {
+    if (user && typeof user.phoneNumber === "string" && user.phoneNumber && !phoneNumber) {
+      setPhoneNumber(user.phoneNumber);
+    }
+  }, [user, phoneNumber]);
+
   const deadlinePassed = useMemo(() => {
     if (!event?.registrationDeadline) return false;
     return new Date() > new Date(event.registrationDeadline);
@@ -74,7 +82,7 @@ const StudentEventRegistrationPage = () => {
       const nonEmpty = members.filter((m) => m.name || m.email || m.phoneNumber);
       return nonEmpty.length >= minMembersRequired && nonEmpty.length <= maxMembersAllowed;
     }
-    // Non-team: ensure user has basic profile details
+    // Non-team: ensure user has basic profile details (phone captured at signup)
     return !!(user?.name && user?.email);
   };
 
@@ -92,13 +100,13 @@ const StudentEventRegistrationPage = () => {
         payload.teamMembers = members
           .filter((m) => m.name || m.email || m.phoneNumber)
           .map((m) => ({ name: m.name, email: m.email, phoneNumber: m.phoneNumber }));
-        if (user?.name || user?.email) {
-          payload.teamLeader = { name: user?.name || "", email: user?.email || "" };
+        if (user?.name || user?.email || user?.phoneNumber) {
+          payload.teamLeader = { name: user?.name || "", email: user?.email || "", phoneNumber: user?.phoneNumber || "" };
         }
       } else {
         // Individual registration: include student identity for convenience
-        if (user?.name || user?.email) {
-          payload.teamLeader = { name: user?.name || "", email: user?.email || "" };
+        if (user?.name || user?.email || phoneNumber) {
+          payload.teamLeader = { name: user?.name || "", email: user?.email || "", phoneNumber: phoneNumber || "" };
         }
       }
       await studentAPI.registerForEvent(id, payload);
@@ -142,6 +150,30 @@ const StudentEventRegistrationPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 glass-panel rounded-2xl p-6">
             <h1 className="text-2xl font-bold mb-2">Register for {event.title}</h1>
+            {/* Timeline overview */}
+            <div className="mb-4">
+              <div className="flex items-center gap-3 text-xs text-slate-400">
+                {isTeamFlow ? (
+                  <>
+                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-brand-cyan"></span> Register</span>
+                    <span>→</span>
+                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-slate-500"></span> Await Host Selection</span>
+                    <span>→</span>
+                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-slate-500"></span> Await HoD Approval</span>
+                    <span>→</span>
+                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-slate-500"></span> Approved/Rejected</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-brand-cyan"></span> Register</span>
+                    <span>→</span>
+                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-slate-500"></span> Await HoD Approval</span>
+                    <span>→</span>
+                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-slate-500"></span> Approved/Rejected</span>
+                  </>
+                )}
+              </div>
+            </div>
             {isTeamFlow ? (
               <>
                 <p className="text-slate-400 mb-6 text-sm">Provide your team details below.</p>
@@ -207,6 +239,7 @@ const StudentEventRegistrationPage = () => {
                 <div className="rounded-xl border border-white/10 p-4 bg-slate-900/40 space-y-2 mb-4">
                   <div><span className="text-slate-400">Name:</span> {user?.name || '—'}</div>
                   <div><span className="text-slate-400">Email:</span> {user?.email || '—'}</div>
+                  <div><span className="text-slate-400">Phone:</span> {user?.phoneNumber || '—'}</div>
                   {user?.college && <div><span className="text-slate-400">College:</span> {user.college}</div>}
                   {user?.department && <div><span className="text-slate-400">Department:</span> {user.department}</div>}
                 </div>

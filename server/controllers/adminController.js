@@ -13,10 +13,12 @@ const getPendingRequests = async (req, res) => {
       .populate('event', 'title date location')
       .sort({ requestDate: 1 });
 
-    // Filter manually to show only students from Admin's college
-    const collegeRequests = requests.filter(reqObj => 
-      reqObj.student.college === req.user.college
-    );
+    // Filter manually to show only students from Admin's college (guard against missing refs)
+    const adminCollege = req.user && req.user.college ? String(req.user.college) : null;
+    const collegeRequests = requests.filter((reqObj) => {
+      const studentCollege = reqObj && reqObj.student && reqObj.student.college ? String(reqObj.student.college) : null;
+      return adminCollege && studentCollege && studentCollege === adminCollege;
+    });
 
     res.status(200).json(collegeRequests);
   } catch (error) {

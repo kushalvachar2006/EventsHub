@@ -71,33 +71,57 @@ exports.selectStudent = async (req, res) => {
 
     // Auto-create HoD permission request with default letter template
     try {
-      const teamLines = [];
-      if (registration.teamLeader && (registration.teamLeader.name || registration.teamLeader.email)) {
-        teamLines.push(`- Leader: ${registration.teamLeader.name || ''} ${registration.teamLeader.email ? `(${registration.teamLeader.email})` : ''}`.trim());
+      // Build team member names list (leader first if available)
+      const memberNames = [];
+      if (registration.teamLeader && registration.teamLeader.name) {
+        memberNames.push(registration.teamLeader.name);
       }
       if (Array.isArray(registration.teamMembers)) {
-        registration.teamMembers.forEach((m, idx) => {
-          if (m && (m.name || m.email)) {
-            teamLines.push(`- Member ${idx + 1}: ${m.name || ''} ${m.email ? `(${m.email})` : ''}`.trim());
-          }
+        registration.teamMembers.forEach((m) => {
+          if (m && m.name) memberNames.push(m.name);
         });
       }
 
+      // Contact line: prefer email and a contact number if available
+      const contactParts = [];
+      if (registration.student?.email) contactParts.push(registration.student.email);
+      const leaderPhone = registration.teamLeader?.phoneNumber;
+      const studentPhone = registration.student?.phoneNumber;
+      if (leaderPhone) contactParts.push(leaderPhone);
+      else if (studentPhone) contactParts.push(studentPhone);
+
+      const studentName = registration.student?.name || 'Student';
+      const departmentName = registration.student?.department || 'Department';
+      const collegeName = registration.student?.college || '';
+      const eventTitle = registration.event?.title || 'Event';
+      const eventDateStr = registration.event?.date ? new Date(registration.event.date).toLocaleString() : '';
+
       const letter = [
-        `Subject: Permission Request for ${registration.event.title}`,
+        `Subject: Permission Request to Participate in ${eventTitle}`,
         '',
-        `Respected HoD,`,
+        'Respected Head of the Department,',
         '',
-        `I, ${registration.student?.name || 'Student'}, from ${registration.student?.department || 'Department'} (${registration.student?.college || ''}), humbly request permission to participate in the event "${registration.event.title}" scheduled on ${new Date(registration.event.date).toLocaleString()}.`,
+        'I hope this letter finds you in good health and high spirits.',
+        '',
+        `I, ${studentName}, a student of the ${departmentName} department at ${collegeName}, respectfully request your kind permission to participate in the event titled "${eventTitle}", which is scheduled to be held on ${eventDateStr}.`,
+        '',
+        'This event provides an excellent opportunity for learning, skill development, and exposure beyond the classroom. Participation in such activities will contribute positively to my academic and professional growth.',
         '',
         `Team Name: ${registration.teamName || 'N/A'}`,
-        ...(teamLines.length ? ['Team Members:', ...teamLines] : []),
+        'Team Members:',
+        ...memberNames.map((n, idx) => `* ${n}`),
         '',
-        `We assure you that all academic responsibilities will be managed appropriately. Kindly grant us permission to attend the event.`,
+        'I assure you that my participation in this event will not interfere with my academic responsibilities. I will make sure to complete all assignments, attend missed classes as required, and maintain discipline and academic integrity.',
         '',
-        `Sincerely,`,
-        `${registration.student?.name || 'Student'}`,
-        `${registration.student?.email || ''}`,
+        'I kindly request you to grant me permission to attend the event and oblige. I shall be extremely grateful for your support and encouragement.',
+        '',
+        'Thanking you in anticipation.',
+        '',
+        'Yours sincerely,',
+        studentName,
+        departmentName,
+        collegeName,
+        contactParts.join(' / '),
       ].join('\n');
 
       await PermissionRequest.create({

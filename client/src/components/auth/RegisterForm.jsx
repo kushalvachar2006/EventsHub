@@ -11,6 +11,9 @@ import {
   GraduationCap,
   ArrowRight,
   Sparkles,
+  Eye,
+  EyeOff,
+  Phone,
 } from "lucide-react";
 import LuminaLogo from "../common/LuminaLogo.jsx";
 
@@ -21,15 +24,23 @@ const RegisterForm = () => {
   const [role, setRole] = useState("student");
   const [college, setCollege] = useState(null);
   const [department, setDepartment] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { register } = useAuth();
   const { show } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password || !name || !college) {
-      show("Please fill in all fields, including your college.", "error");
+    if (!email || !password || !name || !college || !phoneNumber) {
+      show("Please fill in all fields, including your college and phone number.", "error");
+      return;
+    }
+    // Basic phone number validation (10+ digits)
+    const digits = String(phoneNumber).replace(/\D/g, "");
+    if (digits.length < 10) {
+      show("Please enter a valid phone number (10 digits)", "error");
       return;
     }
     setLoading(true);
@@ -41,6 +52,7 @@ const RegisterForm = () => {
         role,
         college: college.name,
         department,
+        phoneNumber,
       });
       show("Registration successful!", "success");
       navigate("/dashboard");
@@ -147,7 +159,7 @@ const RegisterForm = () => {
                   <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-blue-400 transition-colors" />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   disabled={loading}
                   className="input-field !pl-12"
@@ -155,6 +167,14 @@ const RegisterForm = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Create a strong password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
             </div>
 
@@ -182,6 +202,29 @@ const RegisterForm = () => {
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
                   placeholder="e.g., Computer Science"
+                />
+              </div>
+            </div>
+
+            {/* Phone Number Field */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Phone Number
+              </label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                  <Phone className="h-5 w-5 text-slate-400 group-focus-within:text-blue-400 transition-colors" />
+                </div>
+                <input
+                  type="tel"
+                  required
+                  disabled={loading}
+                  className="input-field !pl-12"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="10-digit phone number"
+                  inputMode="tel"
+                  autoComplete="tel"
                 />
               </div>
             </div>

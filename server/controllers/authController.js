@@ -10,7 +10,7 @@ const generateToken = (id) => {
 // @desc    Register new user
 // @route   POST /api/auth/register
 const registerUser = async (req, res) => {
-  const { name, email, password, role, college, department } = req.body;
+  const { name, email, password, role, college, department, phoneNumber } = req.body;
 
   try {
     const userExists = await User.findOne({ email });
@@ -29,6 +29,7 @@ const registerUser = async (req, res) => {
       role,
       college,
       department,
+      phoneNumber,
     });
 
     if (user) {
@@ -38,8 +39,10 @@ const registerUser = async (req, res) => {
         email: user.email,
         role: user.role,
         college: user.college,
+        phoneNumber: user.phoneNumber,
         token: generateToken(user.id),
       });
+      console.log('phoneNumber from req:', phoneNumber)
     } else {
       res.status(400).json({ message: 'Invalid user data' });
     }
@@ -63,6 +66,7 @@ const loginUser = async (req, res) => {
         email: user.email,
         role: user.role,
         college: user.college,
+        phoneNumber: user.phoneNumber,
         token: generateToken(user.id),
       });
     } else {

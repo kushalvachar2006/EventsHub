@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   },
   college: { type: String, required: true }, // Crucial for filtering
   department: { type: String }, // Useful for HoD logic
+  phoneNumber: { type: String }, // Contact number
   createdAt: { type: Date, default: Date.now },
 });
 
