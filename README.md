@@ -5,7 +5,6 @@
 ### College Event Management Platform
 
 [![MERN Stack](https://img.shields.io/badge/Stack-MERN-green)](https://github.com/kushalvachar2006/EventsHub)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red)](https://github.com/kushalvachar2006/EventsHub)
 
