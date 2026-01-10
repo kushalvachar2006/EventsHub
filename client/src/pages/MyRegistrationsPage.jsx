@@ -179,7 +179,14 @@ const MyRegistrationsPage = () => {
                           Submitted to HoD
                         </button>
                       )}
-                      {reg.status === "approved" && (
+                      {(() => {
+                        const cat = reg?.event?.category;
+                        const isTeamFlow =
+                          cat === "Hackathon" ||
+                          (cat === "Competition" && !!reg?.event?.isTeamCompetition);
+                        // Show details for approved only if team flow; hide for individual registrations
+                        return reg.status === "approved" && isTeamFlow;
+                      })() && (
                         <button
                           onClick={() => setDetailsReg(reg)}
                           className="px-4 py-2 bg-brand-cyan/20 hover:bg-brand-cyan/25 text-white rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border border-brand-cyan/30"

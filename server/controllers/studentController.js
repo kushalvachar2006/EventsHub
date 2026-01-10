@@ -26,7 +26,26 @@ const registerForEvent = async (req, res) => {
       return res.status(400).json({ message: 'Already registered for this event' });
     }
 
-    const registration = await Registration.create({
+    // Determine if this event requires team registration
+    const isTeamFlow =
+      event.category === 'Hackathon' ||
+      (event.category === 'Competition' && !!event.isTeamCompetition);
+
+    // Enforce capacity based on registrationLimit (when provided)
+    if (typeof event.registrationLimit === 'number' && event.registrationLimit > 0) {
+      // Count already accepted registrations; for individual flow we auto-approve, for team flow host may approve later
+      // Consider selected, awaiting-hod-approval, approved as consuming capacity
+      const acceptedCount = await Registration.countDocuments({
+        event: eventId,
+        status: { $in: ['selected', 'awaiting-hod-approval', 'approved'] },
+      });
+      if (acceptedCount >= event.registrationLimit) {
+        return res.status(400).json({ message: 'Registrations are full for this event' });
+      }
+    }
+
+    // Create base registration document
+    const baseDoc = {
       event: eventId,
       student: studentId,
       status: 'pending',
@@ -38,12 +57,15 @@ const registerForEvent = async (req, res) => {
             phoneNumber: leader.phoneNumber || '',
           }
         : undefined,
-      teamMembers: teamMembers.map(m => ({
+      teamMembers: teamMembers.map((m) => ({
         name: m?.name || '',
         email: m?.email || '',
         phoneNumber: m?.phoneNumber || '',
       })),
-    });
+    };
+
+    // For individual registrations, do not auto-approve. HoD approval is mandatory.
+    const registration = await Registration.create(baseDoc);
 
     // Notify host about new registration
     try {
@@ -59,6 +81,59 @@ const registerForEvent = async (req, res) => {
       }
     } catch (notifyErr) {
       // non-blocking
+    }
+    
+    // For individual flow, immediately create HoD permission request using revised individual letter
+    if (!isTeamFlow) {
+      try {
+        const studentName = req.user?.name || 'Student';
+        const dept = req.user?.department || 'Department';
+        const college = req.user?.college ? ` (${req.user.college})` : '';
+        const studentEmail = req.user?.email || '';
+        const eventTitle = event?.title || 'Event';
+        const eventDateStr = event?.date ? new Date(event.date).toLocaleString() : '';
+
+        const letter = [
+          `Subject: Request for Approval – Individual Registration for ${eventTitle}`,
+          '',
+          'Respected HoD,',
+          '',
+          `I, ${studentName}, from ${dept}${college}, request approval to participate individually in the event "${eventTitle}" scheduled on ${eventDateStr}.`,
+          '',
+          'I confirm that my academic schedule and attendance requirements will be maintained and I will adhere to the institutional code of conduct during the event.',
+          '',
+          'I kindly request your approval.',
+          '',
+          'Sincerely,',
+          `${studentName}`,
+          `${studentEmail}`,
+        ].join('\n');
+
+        await PermissionRequest.create({
+          student: req.user.id,
+          event: event._id,
+          registration: registration._id,
+          reasonForAttending: letter,
+          teamMembers: [],
+        });
+
+        // Update registration status to awaiting HoD approval
+        registration.status = 'awaiting-hod-approval';
+        await registration.save();
+
+        // Notify student that HoD request was submitted
+        try {
+          await Notification.create({
+            recipient: req.user.id,
+            type: 'selection',
+            registration: registration._id,
+            event: event._id,
+            message: `Your registration for "${eventTitle}" has been submitted for HoD approval.`,
+          });
+        } catch (e) {}
+      } catch (autoErr) {
+        // If auto-create fails, leave registration as pending and let student use form
+      }
     }
 
     res.status(201).json(registration);

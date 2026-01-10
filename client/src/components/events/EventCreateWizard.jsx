@@ -44,6 +44,8 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
   const [maxTeamSize, setMaxTeamSize] = useState("");
   const [prizePool, setPrizePool] = useState("");
   const [prizeCurrency, setPrizeCurrency] = useState("INR");
+  const [isTeamCompetition, setIsTeamCompetition] = useState(false);
+  const [registrationLimit, setRegistrationLimit] = useState("");
 
   // Step 4: Organizer & Confirmation
   const [organizerName, setOrganizerName] = useState("");
@@ -111,6 +113,10 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
       if (initialValues.prizePool) setPrizePool(initialValues.prizePool);
       if (initialValues.prizeCurrency)
         setPrizeCurrency(initialValues.prizeCurrency);
+      if (typeof initialValues.isTeamCompetition === "boolean")
+        setIsTeamCompetition(initialValues.isTeamCompetition);
+      if (typeof initialValues.registrationLimit === "number")
+        setRegistrationLimit(String(initialValues.registrationLimit));
       // Organizer
       if (initialValues.organizerName)
         setOrganizerName(initialValues.organizerName);
@@ -124,6 +130,15 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
       // ignore prefill errors
     }
   }, [initialValues]);
+
+  // Default to Individual registration unless host explicitly enables team competition
+  // Do not override when editing an existing event (initialValues present)
+  useEffect(() => {
+    if (initialValues) return;
+    if (category !== "Competition" && category !== "Cultural") {
+      if (isTeamCompetition) setIsTeamCompetition(false);
+    }
+  }, [category, initialValues, isTeamCompetition]);
 
   const htmlToText = (html) =>
     (html || "")
@@ -160,7 +175,7 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
 
   const canNext = () => {
     if (step === 1) {
-      const basic = title.trim() && htmlToText(description);
+      const basic = title.trim() && htmlToText(description) && !!category;
       if (category === "Hackathon")
         return basic && ["8", "12", "24"].includes(hackDuration);
       return basic;
@@ -177,13 +192,26 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
     }
     if (step === 3) {
       const locOk = mode === "Online" ? !!meetingLink.trim() : !!venue.trim();
-      const minOk =
-        minTeamSize === "" ||
-        (!isNaN(Number(minTeamSize)) && Number(minTeamSize) >= 1);
-      const maxOk =
-        maxTeamSize === "" ||
-        (!isNaN(Number(maxTeamSize)) && Number(maxTeamSize) >= 1);
-      return locOk && minOk && maxOk;
+      const teamFieldsVisibleHack = category === "Hackathon";
+      const teamFieldsVisibleComp =
+        (category === "Competition" || category === "Cultural") &&
+        isTeamCompetition;
+      const teamFieldsVisible = teamFieldsVisibleHack || teamFieldsVisibleComp;
+      const minOk = !teamFieldsVisible
+        ? true
+        : !isNaN(Number(minTeamSize)) && Number(minTeamSize) >= 1;
+      const maxOk = !teamFieldsVisible
+        ? true
+        : !isNaN(Number(maxTeamSize)) && Number(maxTeamSize) >= 1;
+      const needsPrize = category === "Competition" || category === "Hackathon";
+      const prizeOk = !needsPrize
+        ? true
+        : prizePool !== "" && !isNaN(Number(prizePool)) && Number(prizePool) >= 0;
+      const regLimitOk =
+        registrationLimit !== "" &&
+        !isNaN(Number(registrationLimit)) &&
+        Number(registrationLimit) >= 1;
+      return locOk && minOk && maxOk && prizeOk && regLimitOk;
     }
     if (step === 4)
       return organizerName.trim() && /.+@.+\..+/.test(contactEmail);
@@ -415,6 +443,13 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
         );
         // Team size and prize
         appendIfChanged(
+          "isTeamCompetition",
+          isTeamCompetition,
+          typeof init.isTeamCompetition === "boolean"
+            ? init.isTeamCompetition
+            : false
+        );
+        appendIfChanged(
           "minTeamSize",
           minTeamSize === "" ? "" : Number(minTeamSize),
           typeof init.minTeamSize === "number" ? init.minTeamSize : ""
@@ -423,6 +458,13 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
           "teamSize",
           maxTeamSize === "" ? "" : Number(maxTeamSize),
           typeof init.teamSize === "number" ? init.teamSize : ""
+        );
+        appendIfChanged(
+          "registrationLimit",
+          registrationLimit === "" ? "" : Number(registrationLimit),
+          typeof init.registrationLimit === "number"
+            ? init.registrationLimit
+            : ""
         );
         appendIfChanged(
           "prizePool",
@@ -456,8 +498,11 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
         if (contactEmail) form.append("contactEmail", contactEmail);
         if (organizerWebsite) form.append("organizerWebsite", organizerWebsite);
         form.append("eventMode", mode);
+        form.append("isTeamCompetition", isTeamCompetition);
         if (minTeamSize !== "") form.append("minTeamSize", Number(minTeamSize));
         if (maxTeamSize !== "") form.append("teamSize", Number(maxTeamSize));
+        if (registrationLimit !== "")
+          form.append("registrationLimit", Number(registrationLimit));
         if (prizePool !== "" && !Number.isNaN(Number(prizePool))) {
           form.append("prizePool", Number(prizePool));
         }
@@ -846,75 +891,141 @@ const EventCreateWizard = ({ onSubmit, initialValues = null }) => {
 
       {step === 3 && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Min team size
-              </label>
-              <input
-                type="number"
-                min="1"
-                className="input-field"
-                value={minTeamSize}
-                onChange={(e) => setMinTeamSize(e.target.value)}
-                placeholder="e.g., 1"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Max team size
-              </label>
-              <input
-                type="number"
-                min="1"
-                className="input-field"
-                value={maxTeamSize}
-                onChange={(e) => setMaxTeamSize(e.target.value)}
-                placeholder="e.g., 4"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Prize pool amount
-              </label>
-              <div className="grid grid-cols-[1fr_auto] gap-3">
+          {/* Team options (Competition/Cultural) */}
+          {(category === "Competition" || category === "Cultural") && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-1 flex items-center gap-3">
                 <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  className="input-field"
-                  value={
-                    prizePool ? Number(prizePool).toLocaleString("en-IN") : ""
-                  }
-                  onChange={(e) => {
-                    const digits = String(e.target.value).replace(
-                      /[^0-9]/g,
-                      ""
-                    );
-                    if (digits === "") {
-                      setPrizePool("");
-                      return;
-                    }
-                    let n = Number(digits);
-                    if (Number.isNaN(n)) return;
-                    if (n > 1000000) n = 1000000; // cap at 10,00,000
-                    setPrizePool(String(n));
-                  }}
-                  placeholder="e.g., 50,000"
+                  id="isTeamCompetition"
+                  type="checkbox"
+                  className="h-4 w-4"
+                  checked={isTeamCompetition}
+                  onChange={(e) => setIsTeamCompetition(e.target.checked)}
                 />
-                <select
-                  className="input-field"
-                  value={prizeCurrency}
-                  onChange={(e) => setPrizeCurrency(e.target.value)}
-                >
-                  <option value="INR">INR</option>
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                </select>
+                <label htmlFor="isTeamCompetition" className="text-sm">
+                  Team competition
+                </label>
               </div>
+              {isTeamCompetition && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Min team size
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      className="input-field"
+                      value={minTeamSize}
+                      onChange={(e) => setMinTeamSize(e.target.value)}
+                      placeholder="e.g., 1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Max team size
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      className="input-field"
+                      value={maxTeamSize}
+                      onChange={(e) => setMaxTeamSize(e.target.value)}
+                      placeholder="e.g., 4"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Prize + Registration limit */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {(category === "Competition" || category === "Hackathon") && (
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Prize pool amount
+                </label>
+                <div className="grid grid-cols-[1fr_auto] gap-3">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    className="input-field"
+                    value={
+                      prizePool ? Number(prizePool).toLocaleString("en-IN") : ""
+                    }
+                    onChange={(e) => {
+                      const digits = String(e.target.value).replace(/[^0-9]/g, "");
+                      if (digits === "") {
+                        setPrizePool("");
+                        return;
+                      }
+                      let n = Number(digits);
+                      if (Number.isNaN(n)) return;
+                      if (n > 1000000) n = 1000000; // cap at 10,00,000
+                      setPrizePool(String(n));
+                    }}
+                    placeholder="e.g., 50,000"
+                  />
+                  <select
+                    className="input-field"
+                    value={prizeCurrency}
+                    onChange={(e) => setPrizeCurrency(e.target.value)}
+                  >
+                    <option value="INR">INR</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                  </select>
+                </div>
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Registration limit (max accepted)
+              </label>
+              <input
+                type="number"
+                min="1"
+                className="input-field"
+                value={registrationLimit}
+                onChange={(e) => setRegistrationLimit(e.target.value)}
+                placeholder="e.g., 100"
+              />
             </div>
           </div>
+          {/* Hackathon team sizes (same as before) */}
+          {category === "Hackathon" && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Min team size
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  className="input-field"
+                  value={minTeamSize}
+                  onChange={(e) => setMinTeamSize(e.target.value)}
+                  placeholder="e.g., 1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Max team size
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  className="input-field"
+                  value={maxTeamSize}
+                  onChange={(e) => setMaxTeamSize(e.target.value)}
+                  placeholder="e.g., 4"
+                />
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium mb-2">

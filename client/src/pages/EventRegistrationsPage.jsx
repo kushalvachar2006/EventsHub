@@ -107,6 +107,10 @@ const EventRegistrationsPage = () => {
                     const isAwaitingHoD = r.status === "awaiting-hod-approval";
                     const isApprovedByHoD = r.status === "approved";
                     const isRejectedByHoD = r.status === "rejected-by-hod";
+                    const isTeamFlow =
+                      event?.category === "Hackathon" ||
+                      (event?.category === "Competition" && !!event?.isTeamCompetition);
+                    const isAutoApprovedIndividual = !isTeamFlow && isApprovedByHoD;
                     // For host view: treat HoD statuses as "Selected" since student has moved past host approval
                     const isActionable =
                       !isSelected &&
@@ -129,12 +133,14 @@ const EventRegistrationsPage = () => {
                       ) : (
                         <Clock className="h-4 w-4 text-brand-cyan" />
                       );
-                    const statusText =
-                      displayStatus === "selected"
-                        ? "Selected"
-                        : displayStatus === "not-selected"
-                        ? "Rejected"
-                        : "Pending";
+                    // Status text; if non-team and approved, show 'Approved (Auto)'
+                    const statusText = isAutoApprovedIndividual
+                      ? "Approved (Auto)"
+                      : displayStatus === "selected"
+                      ? "Selected"
+                      : displayStatus === "not-selected"
+                      ? "Rejected"
+                      : "Pending";
 
                     return (
                       <tr
@@ -228,6 +234,11 @@ const EventRegistrationsPage = () => {
                               {statusText}
                             </span>
                           </div>
+                          {isAutoApprovedIndividual && (
+                            <div className="mt-1 inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-300 border border-green-500/20">
+                              Auto-approved
+                            </div>
+                          )}
                           {r.feedback && (
                             <div className="mt-1 text-xs text-gray-600 dark:text-slate-400 bg-yellow-50 dark:bg-yellow-900/30 dark:border dark:border-yellow-800/50 p-1 rounded">
                               {isSelected ? "✓" : "✗"} {r.feedback}

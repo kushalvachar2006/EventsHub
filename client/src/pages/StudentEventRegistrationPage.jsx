@@ -27,11 +27,20 @@ const StudentEventRegistrationPage = () => {
         setError("");
         const { data } = await eventsAPI.getEvent(id);
         setEvent(data);
-        // Initialize member rows based on min team size (excluding leader)
-        const minTeam = Number(data?.minTeamSize || 1);
-        const minMembersRequired = Math.max(minTeam - 1, 0);
-        if (minMembersRequired >= 0) {
-          setMembers(Array.from({ length: minMembersRequired }, () => ({ name: "", email: "", phoneNumber: "" })));
+        // Initialize member rows based on min team size (excluding leader) only for team flow
+        const isTeamFlow =
+          data?.category === "Hackathon" ||
+          (data?.category === "Competition" && !!data?.isTeamCompetition);
+        if (isTeamFlow) {
+          const minTeam = Number(data?.minTeamSize || 1);
+          const minMembersRequired = Math.max(minTeam - 1, 0);
+          if (minMembersRequired >= 0) {
+            setMembers(
+              Array.from({ length: minMembersRequired }, () => ({ name: "", email: "", phoneNumber: "" }))
+            );
+          }
+        } else {
+          setMembers([{ name: "", email: "", phoneNumber: "" }]);
         }
       } catch (e) {
         setError("Failed to load event");
@@ -47,15 +56,26 @@ const StudentEventRegistrationPage = () => {
     return new Date() > new Date(event.registrationDeadline);
   }, [event]);
 
+  const isTeamFlow = useMemo(() => {
+    return (
+      event?.category === "Hackathon" ||
+      (event?.category === "Competition" && !!event?.isTeamCompetition)
+    );
+  }, [event]);
+
   const canSubmit = () => {
-    if (!teamName.trim()) return false;
     if (deadlinePassed) return false;
-    const minTeam = Number(event?.minTeamSize || 1);
-    const maxTeam = Number(event?.teamSize || minTeam);
-    const minMembersRequired = Math.max(minTeam - 1, 0); // excluding leader
-    const maxMembersAllowed = Math.max(maxTeam - 1, 0);  // excluding leader
-    const nonEmpty = members.filter((m) => m.name || m.email || m.phoneNumber);
-    return nonEmpty.length >= minMembersRequired && nonEmpty.length <= maxMembersAllowed;
+    if (isTeamFlow) {
+      if (!teamName.trim()) return false;
+      const minTeam = Number(event?.minTeamSize || 1);
+      const maxTeam = Number(event?.teamSize || minTeam);
+      const minMembersRequired = Math.max(minTeam - 1, 0); // excluding leader
+      const maxMembersAllowed = Math.max(maxTeam - 1, 0); // excluding leader
+      const nonEmpty = members.filter((m) => m.name || m.email || m.phoneNumber);
+      return nonEmpty.length >= minMembersRequired && nonEmpty.length <= maxMembersAllowed;
+    }
+    // Non-team: ensure user has basic profile details
+    return !!(user?.name && user?.email);
   };
 
   const onSubmit = async (e) => {
@@ -66,18 +86,26 @@ const StudentEventRegistrationPage = () => {
     }
     try {
       setSubmitting(true);
-      const payload = {
-        teamName,
-        teamMembers: members
+      const payload = {};
+      if (isTeamFlow) {
+        payload.teamName = teamName;
+        payload.teamMembers = members
           .filter((m) => m.name || m.email || m.phoneNumber)
-          .map((m) => ({ name: m.name, email: m.email, phoneNumber: m.phoneNumber })),
-      };
-      // Optionally supply leader from profile when available
-      if (user?.name || user?.email) {
-        payload.teamLeader = { name: user?.name || "", email: user?.email || "" };
+          .map((m) => ({ name: m.name, email: m.email, phoneNumber: m.phoneNumber }));
+        if (user?.name || user?.email) {
+          payload.teamLeader = { name: user?.name || "", email: user?.email || "" };
+        }
+      } else {
+        // Individual registration: include student identity for convenience
+        if (user?.name || user?.email) {
+          payload.teamLeader = { name: user?.name || "", email: user?.email || "" };
+        }
       }
       await studentAPI.registerForEvent(id, payload);
-      show("Registration submitted. Await host approval.", "success");
+      show(
+        isTeamFlow ? "Registration submitted. Await host approval." : "Registration successful.",
+        "success"
+      );
       navigate("/my-registrations");
     } catch (e) {
       show(e?.response?.data?.message || "Registration failed", "error");
@@ -114,62 +142,81 @@ const StudentEventRegistrationPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 glass-panel rounded-2xl p-6">
             <h1 className="text-2xl font-bold mb-2">Register for {event.title}</h1>
-            <p className="text-slate-400 mb-6 text-sm">Provide your team details below.</p>
-            <form onSubmit={onSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium mb-2">Team name</label>
-                <input className="input-field" value={teamName} onChange={(e) => setTeamName(e.target.value)} placeholder="e.g., Code Warriors" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 text-sm font-semibold mb-2">
-                  <Users className="h-4 w-4" /> Team Members
-                </div>
-                <p className="text-xs text-slate-400 mb-2">
-                  Allowed team size: {Number(event?.minTeamSize || 1)} to {Number(event?.teamSize || event?.minTeamSize || 1)} members including the team leader.
-                  {` You can add up to ${Math.max(Number(event?.teamSize || 1) - 1, 0)} member(s) here.`}
-                </p>
-                <div className="space-y-3">
-                  {members.map((m, idx) => (
-                    <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <input className="input-field" placeholder="Name" value={m.name} onChange={(e) => {
-                        const next = [...members]; next[idx] = { ...next[idx], name: e.target.value }; setMembers(next);
-                      }} />
-                      <input className="input-field" type="email" placeholder="Email" value={m.email} onChange={(e) => {
-                        const next = [...members]; next[idx] = { ...next[idx], email: e.target.value }; setMembers(next);
-                      }} />
-                      <input className="input-field" type="tel" placeholder="Phone number" value={m.phoneNumber} onChange={(e) => {
-                        const next = [...members]; next[idx] = { ...next[idx], phoneNumber: e.target.value }; setMembers(next);
-                      }} />
+            {isTeamFlow ? (
+              <>
+                <p className="text-slate-400 mb-6 text-sm">Provide your team details below.</p>
+                <form onSubmit={onSubmit} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Team name</label>
+                    <input className="input-field" value={teamName} onChange={(e) => setTeamName(e.target.value)} placeholder="e.g., Code Warriors" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 text-sm font-semibold mb-2">
+                      <Users className="h-4 w-4" /> Team Members
                     </div>
-                  ))}
+                    <p className="text-xs text-slate-400 mb-2">
+                      Allowed team size: {Number(event?.minTeamSize || 1)} to {Number(event?.teamSize || event?.minTeamSize || 1)} members including the team leader.
+                      {` You can add up to ${Math.max(Number(event?.teamSize || 1) - 1, 0)} member(s) here.`}
+                    </p>
+                    <div className="space-y-3">
+                      {members.map((m, idx) => (
+                        <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <input className="input-field" placeholder="Name" value={m.name} onChange={(e) => {
+                            const next = [...members]; next[idx] = { ...next[idx], name: e.target.value }; setMembers(next);
+                          }} />
+                          <input className="input-field" type="email" placeholder="Email" value={m.email} onChange={(e) => {
+                            const next = [...members]; next[idx] = { ...next[idx], email: e.target.value }; setMembers(next);
+                          }} />
+                          <input className="input-field" type="tel" placeholder="Phone number" value={m.phoneNumber} onChange={(e) => {
+                            const next = [...members]; next[idx] = { ...next[idx], phoneNumber: e.target.value }; setMembers(next);
+                          }} />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-3 flex gap-3">
+                      <button
+                        type="button"
+                        className="text-brand-cyan text-sm"
+                        onClick={() => {
+                          const maxTeam = Number(event?.teamSize || event?.minTeamSize || 1);
+                          const maxMembersAllowed = Math.max(maxTeam - 1, 0);
+                          if (members.length >= maxMembersAllowed) {
+                            show(`You can add up to ${maxMembersAllowed} member(s) for this event.`, 'error');
+                            return;
+                          }
+                          setMembers((p) => [...p, { name: "", email: "", phoneNumber: "" }]);
+                        }}
+                      >
+                        + Add member
+                      </button>
+                      {members.length > 0 && (
+                        <button type="button" className="text-slate-400 text-sm" onClick={() => setMembers((p) => p.slice(0, -1))}>Remove last</button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="pt-2">
+                    <button type="submit" disabled={!canSubmit() || submitting} className="btn-primary disabled:opacity-60">
+                      {submitting ? "Submitting..." : "Submit Registration"}
+                    </button>
+                  </div>
+                </form>
+              </>
+            ) : (
+              <>
+                <p className="text-slate-400 mb-6 text-sm">Verify your account details and confirm registration.</p>
+                <div className="rounded-xl border border-white/10 p-4 bg-slate-900/40 space-y-2 mb-4">
+                  <div><span className="text-slate-400">Name:</span> {user?.name || '—'}</div>
+                  <div><span className="text-slate-400">Email:</span> {user?.email || '—'}</div>
+                  {user?.college && <div><span className="text-slate-400">College:</span> {user.college}</div>}
+                  {user?.department && <div><span className="text-slate-400">Department:</span> {user.department}</div>}
                 </div>
-                <div className="mt-3 flex gap-3">
-                  <button
-                    type="button"
-                    className="text-brand-cyan text-sm"
-                    onClick={() => {
-                      const maxTeam = Number(event?.teamSize || event?.minTeamSize || 1);
-                      const maxMembersAllowed = Math.max(maxTeam - 1, 0);
-                      if (members.length >= maxMembersAllowed) {
-                        show(`You can add up to ${maxMembersAllowed} member(s) for this event.`, 'error');
-                        return;
-                      }
-                      setMembers((p) => [...p, { name: "", email: "", phoneNumber: "" }]);
-                    }}
-                  >
-                    + Add member
+                <form onSubmit={onSubmit}>
+                  <button type="submit" disabled={!canSubmit() || submitting} className="btn-primary disabled:opacity-60">
+                    {submitting ? "Submitting..." : "Confirm & Register"}
                   </button>
-                  {members.length > 0 && (
-                    <button type="button" className="text-slate-400 text-sm" onClick={() => setMembers((p) => p.slice(0, -1))}>Remove last</button>
-                  )}
-                </div>
-              </div>
-              <div className="pt-2">
-                <button type="submit" disabled={!canSubmit() || submitting} className="btn-primary disabled:opacity-60">
-                  {submitting ? "Submitting..." : "Submit Registration"}
-                </button>
-              </div>
-            </form>
+                </form>
+              </>
+            )}
           </div>
           <div className="lg:col-span-1 glass-panel rounded-2xl p-6">
             <div className="flex items-center gap-2 text-slate-300 mb-2">
