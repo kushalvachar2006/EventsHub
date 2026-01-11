@@ -5,8 +5,8 @@
 ### College Event Management Platform
 
 [![MERN Stack](https://img.shields.io/badge/Stack-MERN-green)](https://github.com/kushalvachar2006/EventsHub)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red)](https://github.com/kushalvachar2006/EventsHub)
+[![React](https://img.shields.io/badge/React-19.1.1-blue)](https://react.dev/versions) 
+[![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)](https://www.mongodb.com/)
 
 **A role-driven event management platform that centralizes college events and simplifies student participation approvals.**
 
