@@ -20,7 +20,7 @@
 
 **EventsHub** is a comprehensive MERN stack–based, role-driven event management platform designed to centralize college events and streamline student participation approvals. The platform addresses real-world challenges in college event visibility and approval workflows through a digitized, efficient system.
 
-### The Problem We Solve
+### The Problems :
 
 - **Event Discovery**: Students struggle to find relevant college events scattered across multiple platforms
 - **Registration Difficulty**: Event hosts face difficulties managing large volumes of registrations manually
@@ -51,7 +51,7 @@ EventsHub provides a unified platform where:
 - Send automated notifications to participants
 - Access event analytics and insights
 
-### For Admin (Heads of Department)
+### For Admin (Head of Department)
 - Digital approval dashboard for participation requests
 - One-click approve/reject functionality
 - Department-wide event participation overview
@@ -73,13 +73,13 @@ EventsHub provides a unified platform where:
 - **React.js** - UI library
 - **React Router** - Navigation
 - **Axios** - HTTP client
-- **CSS3/Styled Components** - Styling
+- **CSS3/TailWindCSS** - Styling
 
 ### Backend
 - **Node.js** - Runtime environment
 - **Express.js** - Web framework
 - **MongoDB** - NoSQL database
-- **Mongoose** - ODM
+- **HTTP** - For Server
 
 ### Authentication & Security
 - **JWT** - Token-based authentication
