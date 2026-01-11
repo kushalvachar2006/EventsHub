@@ -10,14 +10,15 @@
 
 **A role-driven event management platform that centralizes college events and simplifies student participation approvals.**
 
+**Live Demo**: [EventsHub](https://events-hub-kva.netlify.app/)
+
 [Features](#-features) • [Tech Stack](#️-tech-stack) • [Getting Started](#-getting-started) • [Contributing](#-contributing) • [License](#-license)
 
 </div>
+
 ---
-### Live Demo : https://events-hub-kva.netlify.app/
 
 ## 📖 About
-
 **EventsHub** is a comprehensive MERN stack–based, role-driven event management platform designed to centralize college events and streamline student participation approvals. The platform addresses real-world challenges in college event visibility and approval workflows through a digitized, efficient system.
 
 ### The Problems :
