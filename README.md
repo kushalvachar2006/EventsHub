@@ -13,8 +13,8 @@
 [Features](#-features) • [Tech Stack](#️-tech-stack) • [Getting Started](#-getting-started) • [Contributing](#-contributing) • [License](#-license)
 
 </div>
-### Live Demo : https://events-hub-kva.netlify.app/
 ---
+### Live Demo : https://events-hub-kva.netlify.app/
 
 ## 📖 About
 
