@@ -1,4 +1,5 @@
 <div align="center">
+<a id="top"></a>
 
 # EventsHub - The Future of Events is Here.
 
@@ -12,13 +13,18 @@
 
 **Live Demo**: [EventsHub](https://events-hub-kva.netlify.app/)
 
-[Features](#-features) • [Tech Stack](#️-tech-stack) • [Getting Started](#-getting-started) • [Contributing](#-contributing) • [License](#-license)
+[About](#about) •
+[Features](#features) • 
+[Tech Stack](#tech-stack) • 
+[Getting Started](#getting-started) • 
+[Contributing](#contributing) 
+
 
 </div>
 
 ---
 
-## 📖 About
+## <a id="about"></a> 📖 About
 **EventsHub** is a comprehensive MERN stack–based, role-driven event management platform designed to centralize college events and streamline student participation approvals. The platform addresses real-world challenges in college event visibility and approval workflows through a digitized, efficient system.
 
 ### The Problems :
@@ -36,7 +42,7 @@ EventsHub provides a unified platform where:
 
 ---
 
-## Features
+## <a id="features"></a> Features
 
 ### For Students
 - Browse and discover college-specific events
@@ -68,7 +74,7 @@ EventsHub provides a unified platform where:
 
 ---
 
-## Tech Stack
+## <a id="tech-stack"></a> Tech Stack
 
 ### Frontend
 - **React.js** - UI library
@@ -135,7 +141,7 @@ EventsHub/
 <img width="690" height="488" alt="image" src="https://github.com/user-attachments/assets/049e00a6-ebd4-4f7a-8c41-6b04dd34e742" />
 
 ---
-## Getting Started
+## <a id="getting-started"></a> Getting Started
 
 ### Prerequisites
 
@@ -207,7 +213,7 @@ Before you begin, ensure you have the following installed:
    Open your browser and navigate to `http://localhost:3000`
 ---
 
-## Contributing
+## <a id="contributing"></a> Contributing
 
 We welcome contributions from the community! EventsHub is open-source and we encourage you to fork the repository and extend it with new features or enhancements.
 
@@ -273,6 +279,7 @@ We welcome contributions from the community! EventsHub is open-source and we enc
 
 <div align="center">
 
-[⬆ Back to Top](#-eventshub)
+[⬆ Back to Top](#top)
+
 
 </div>
