@@ -23,6 +23,9 @@ app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: false }));
 
 // Routes
+app.get("/api", (req, res) => {
+  res.send("Welcome to the Event Management API");
+})
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes); // Public & Host
 app.use("/api/student", studentRoutes); // Protected Student
