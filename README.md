@@ -260,7 +260,7 @@ We welcome contributions from the community! EventsHub is open-source and we enc
 ## Support & Contact
 
 - **GitHub Issues**: [Report bugs or request features](https://github.com/kushalvachar2006/EventsHub/issues)
-- **Email**: kushalvachar2006@gmail.com
+- **Email**: kushalv1306@gmail.com
 - **Discussions**: [Join our discussions](https://github.com/kushalvachar2006/EventsHub/discussions)
 
 ---
